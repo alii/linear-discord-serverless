@@ -26,7 +26,6 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
   const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`;
 
   const embed = {
-    content: 'New Linear issue',
     embeds: [
       {
         color: 0x4752b2,
@@ -35,6 +34,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
         },
         title: payload.data.title,
         url: payload.url,
+        description: payload.data.description || '',
         fields: [
           {
             name: 'Priority',
@@ -42,8 +42,8 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
             inline: true,
           },
           {
-            name: 'Points',
-            value: payload.data.estimate || '0',
+            name: 'Status',
+            value: payload.data.state.name,
             inline: true,
           },
           {
