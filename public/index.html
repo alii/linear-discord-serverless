@@ -77,8 +77,6 @@
       congrats: document.getElementById('congrats'),
     };
 
-    const webhookRegex = /discord.com\/api\/webhooks\/([^\/]+)\/([^\/]+)/;
-
     elements.webhook.input.addEventListener('focus', () => {
       elements.webhook.errorMessage.textContent = '';
     });
@@ -87,12 +85,20 @@
       const { target } = e;
       const { value } = target;
 
-      if (!webhookRegex.test(value)) {
+      const split = value.split('/').filter((x) => x.trim() !== '');
+      const correctWebhookLength = 6;
+
+      if (
+        split.length !== correctWebhookLength ||
+        !value.startsWith('https://discord') ||
+        !value.includes('.com/api/webhook')
+      ) {
         elements.webhook.errorMessage.textContent = 'That is not a valid webhook URL';
+        elements.linear.container.style.visibility = 'hidden';
         return;
       }
 
-      const [, id, token] = value.match(webhookRegex);
+      const [, , , , id, token] = split;
 
       elements.linear.container.style.visibility = 'visible';
       elements.linear.result.textContent = `https://lds.alistair.cloud/api/discord?id=${id}&token=${token}`;
