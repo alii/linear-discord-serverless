@@ -12,8 +12,6 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
   try {
     await sendIssue(body, { id, token });
 
-    console.log('Sent to discord!');
-
     res.json({
       success: true,
     });
