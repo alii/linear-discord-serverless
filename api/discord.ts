@@ -36,7 +36,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
           fields: [
             {
               name: 'Priority',
-              value: getPriorityValue(payload.data.priority ?? 0),
+              value: getPriorityValue(payload.data.priority || 0),
               inline: true,
             },
             {
@@ -46,7 +46,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
             },
             {
               name: 'Labels',
-              value: prettifyLabels(payload.data.labels!),
+              value: prettifyLabels(payload.data.labels || []),
               inline: false,
             },
           ],
