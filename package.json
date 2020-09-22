@@ -4,5 +4,12 @@
   "main": "index.js",
   "repository": "https://github.com/webmail/linear-discord-serverless",
   "author": "Alistair Smith <alistairsmith01@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@now/node": "^1.8.3",
+    "@types/node-fetch": "^2.5.7"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"
+  }
 }
