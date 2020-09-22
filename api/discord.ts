@@ -11,6 +11,9 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 
   try {
     await sendIssue(body, { id, token });
+
+    console.log('Sent to discord!');
+
     res.json({
       success: true,
     });
@@ -24,6 +27,9 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string; token: string }) {
   return fetch(`https://discordapp.com/api/webhooks/${webhook[0]}/${webhook[1]}`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       embeds: [
         {
