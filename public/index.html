@@ -1,0 +1,104 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>linear-discord-serverless</title>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet" />
+    <style>
+      html {
+        font-family: 'PT Mono', monospace;
+        padding: 10%;
+      }
+
+      #webhook-error {
+        color: red;
+      }
+
+      input {
+        font-family: 'PT Mono', monospace;
+        border: none;
+        border-bottom: 1px solid gray;
+        display: inline-block;
+      }
+
+      #linear,
+      #congrats {
+        visibility: hidden;
+      }
+
+      #linear-webhook-result {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>linear-discord-serverless</h1>
+    <h3>Installation instructions</h3>
+    <ol>
+      <li>
+        Create a Discord Webhook
+        <ol>
+          <li>Open Discord</li>
+          <li>Open channel settings for the channel you want to receive notifications in</li>
+          <li>Hit "integrations" and then "webhooks"</li>
+          <li>Create a new webhook. Call it whatever you want and set the profile picture</li>
+          <li>Copy the webhook URL</li>
+          <li>
+            Paste it here:
+            <input type="text" id="webhook-input" />
+            <span id="webhook-error"></span>
+          </li>
+        </ol>
+      </li>
+      <li id="linear">
+        Add webhook to linear
+        <ol>
+          <li>Open linear</li>
+          <li>Go to Team Settings => Webhooks => New Webhook</li>
+          <li>Paste in this URL: <span id="linear-webhook-result"></span></li>
+          <li>Press "create webook"</li>
+        </ol>
+      </li>
+      <li id="congrats">Congrats, you are finished. Leave the rest to us!</li>
+    </ol>
+  </body>
+  <script>
+    const elements = {
+      webhook: {
+        input: document.getElementById('webhook-input'),
+        output: document.getElementById('webhook-output'),
+        errorMessage: document.getElementById('webhook-error'),
+      },
+      linear: {
+        container: document.getElementById('linear'),
+        result: document.getElementById('linear-webhook-result'),
+      },
+      congrats: document.getElementById('congrats'),
+    };
+
+    const webhookRegex = /discordapp.com\/api\/webhooks\/([^\/]+)\/([^\/]+)/;
+
+    elements.webhook.input.addEventListener('focus', () => {
+      elements.webhook.errorMessage.textContent = '';
+    });
+
+    elements.webhook.input.addEventListener('blur', (e) => {
+      const { target } = e;
+      const { value } = target;
+
+      if (!webhookRegex.test(value)) {
+        elements.webhook.errorMessage.textContent = 'That is not a valid webhook URL';
+        return;
+      }
+
+      const [, id, token] = value.match(webhookRegex);
+
+      elements.linear.container.style.visibility = 'visible';
+      elements.linear.result.textContent = `https://lds.alistair.cloud/api/discord?id=${id}&token=${token}`;
+    });
+
+    document.addEventListener('copy', () => {
+      setTimeout(() => (elements.congrats.style.visibility = 'visible'), 2500);
+    });
+  </script>
+</html>
