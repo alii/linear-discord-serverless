@@ -9,15 +9,25 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 
   const body = req.body as IncomingLinearWebhookPayload;
 
+  if (body.action !== 'create' && body.type !== 'Issue') {
+    res.json({
+      success: false,
+      message: 'This is for creation of issues only!',
+    });
+    return;
+  }
+
   try {
     await sendIssue(body, { id, token });
 
     res.json({
       success: true,
+      message: 'Success, webhook has been sent.',
     });
   } catch (e) {
     res.status(500).json({
       success: false,
+      message: `Node.js runtime error: ${e.message}`,
     });
   }
 }
