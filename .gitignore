@@ -2,3 +2,4 @@ node_modules
 .vercel
 .vscode
 .idea
+.DS_Store
