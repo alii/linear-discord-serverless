@@ -23,7 +23,7 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 }
 
 function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string; token: string }) {
-  return fetch(`https://discord.com/api/webhooks/${webhook[0]}/${webhook[1]}`, {
+  return fetch(`https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
