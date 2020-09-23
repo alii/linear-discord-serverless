@@ -7,9 +7,11 @@
   "license": "MIT",
   "devDependencies": {
     "@now/node": "^1.8.3",
+    "@types/moment": "^2.13.0",
     "@types/node-fetch": "^2.5.7"
   },
   "dependencies": {
+    "moment": "^2.29.0",
     "node-fetch": "^2.6.1"
   }
 }

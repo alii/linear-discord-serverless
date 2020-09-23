@@ -1,5 +1,8 @@
 import { NowRequest, NowResponse } from '@now/node';
+import moment from 'moment';
 import fetch from 'node-fetch';
+import { Field as DiscordField, IncomingLinearWebhookPayload } from './_types';
+import { getId, getPriorityValue, parseLabels } from './_util';
 
 export default async function handler(req: NowRequest, res: NowResponse): Promise<void> {
   const { id, token } = req.query as {
@@ -9,11 +12,12 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 
   const body = req.body as IncomingLinearWebhookPayload;
 
-  if (body.action !== 'create' && body.type !== 'Issue') {
+  if (body.action !== 'create' || body.type !== 'Issue') {
     res.json({
       success: false,
       message: 'This is for creation of issues only!',
     });
+
     return;
   }
 
@@ -35,6 +39,50 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string; token: string }) {
   const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`;
 
+  const fields: DiscordField[] = [
+    {
+      name: 'Priority',
+      value: getPriorityValue(payload.data.priority || 0),
+      inline: true,
+    },
+    {
+      name: 'Status',
+      value: payload.data.state.name,
+      inline: true,
+    },
+  ];
+
+  if (payload.data.labels) {
+    fields.push({
+      name: 'Labels',
+      value: parseLabels(payload.data.labels || []),
+      inline: true,
+    });
+  }
+
+  if (payload.data.assigneeId) {
+    fields.push({
+      name: 'Assigned to',
+      value: payload.data.assigneeId,
+      inline: true,
+    });
+  }
+
+  if (payload.data.dueDate) {
+    fields.push({
+      name: 'Due',
+      value: moment(payload.data.dueDate).format('LLL'),
+      inline: true,
+    });
+  }
+
+  if (payload.data.estimate) {
+    fields.push({
+      name: 'Points',
+      value: `${payload.data.estimate} points`,
+    });
+  }
+
   const embed = {
     embeds: [
       {
@@ -45,23 +93,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
         title: payload.data.title,
         url: payload.url,
         description: payload.data.description || '',
-        fields: [
-          {
-            name: 'Priority',
-            value: getPriorityValue(payload.data.priority || 0),
-            inline: true,
-          },
-          {
-            name: 'Status',
-            value: payload.data.state.name,
-            inline: true,
-          },
-          {
-            name: 'Labels',
-            value: prettifyLabels(payload.data.labels || []),
-            inline: false,
-          },
-        ],
+        fields,
         timestamp: new Date(),
         footer: {
           text: `Linear App`,
@@ -72,122 +104,10 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
   };
 
   const body = JSON.stringify(embed);
-  console.log({ body });
 
   return fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body,
   });
-}
-
-/**
- * Get the Priority Value translated
- * @param priority number for priority
- */
-function getPriorityValue(priority: NonNullable<IncomingLinearWebhookPayload['data']['priority']>) {
-  switch (priority) {
-    case 0:
-      return 'None';
-    case 1:
-      return 'Urgent';
-    case 2:
-      return 'High';
-    case 3:
-      return 'Medium';
-    case 4:
-      return 'Low';
-  }
-}
-
-/**
- * Get the task ID from url
- * @param link task url
- */
-function getId(link: string) {
-  return link.split('/')[5];
-}
-
-/**
- * Formats and prettifies label(s)
- * @param labels connected labels
- */
-function prettifyLabels(labels: NonNullable<IncomingLinearWebhookPayload['data']['labels']>) {
-  return labels.map((label) => label.name).join(', ');
-}
-
-interface IncomingLinearWebhookPayload {
-  action: 'create' | 'update' | 'remove';
-  data: Data;
-  type: string;
-  createdAt: string;
-  updatedFrom?: UpdatedFrom;
-  url: string;
-}
-
-interface Data {
-  id: string;
-  title?: string;
-  subscriberIds?: string[];
-  previousIdentifiers?: any[];
-  createdAt: string;
-  updatedAt: string;
-  archivedAt: any;
-  number?: number;
-  description?: string;
-  documentVersion?: number;
-  priority?: number;
-  estimate: any;
-  boardOrder?: number;
-  startedAt: any;
-  completedAt: any;
-  canceledAt: any;
-  autoClosedAt: any;
-  autoArchivedAt: any;
-  dueDate: any;
-  labelIds?: string[];
-  teamId?: string;
-  cycleId?: string;
-  projectId?: string;
-  creatorId?: string;
-  assigneeId?: string;
-  stateId?: string;
-  parentId: any;
-  source?: string;
-  priorityLabel?: string;
-  labels?: Label[];
-  team?: Team;
-  state?: State;
-  body?: string;
-  edited?: boolean;
-  issueId?: string;
-  userId?: string;
-}
-
-interface Label {
-  id: string;
-  name: string;
-  color: string;
-}
-
-interface Team {
-  id: string;
-  name: string;
-  key: string;
-}
-
-interface State {
-  id: string;
-  name: string;
-  color: string;
-  description: any;
-  type: string;
-}
-
-interface UpdatedFrom {
-  updatedAt: string;
-  labelIds?: any[];
-  priorityLabel: string;
-  labels: any[];
-  priority?: number;
 }
