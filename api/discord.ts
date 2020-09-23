@@ -1,7 +1,7 @@
 import { NowRequest, NowResponse } from '@now/node';
 import moment from 'moment';
 import fetch from 'node-fetch';
-import { Field as DiscordField, IncomingLinearWebhookPayload } from './_types';
+import { DiscordMessage, Field as DiscordField, IncomingLinearWebhookPayload } from './_types';
 import { getId, getPriorityValue, parseLabels } from './_util';
 
 export default async function handler(req: NowRequest, res: NowResponse): Promise<void> {
@@ -74,10 +74,11 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
     fields.push({
       name: 'Points',
       value: `${payload.data.estimate} points`,
+      inline: true,
     });
   }
 
-  const embed = {
+  const embed: DiscordMessage = {
     embeds: [
       {
         color: 0x4752b2,
@@ -88,7 +89,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
         url: payload.url,
         description: payload.data.description || '',
         fields,
-        timestamp: new Date(),
+        timestamp: new Date().toString(),
         footer: {
           text: `Linear App`,
           icon_url: 'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png',

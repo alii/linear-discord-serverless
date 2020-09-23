@@ -1,7 +1,34 @@
+export interface DiscordMessage {
+  content?: string;
+  embeds?: Embed[];
+}
+
+export interface Embed {
+  title?: string;
+  description?: string;
+  color?: number;
+  fields?: Field[];
+  author?: Author;
+  footer?: Footer;
+  timestamp?: string;
+  url?: string;
+}
+
 export interface Field {
   name: string;
   value: string;
   inline?: boolean;
+}
+
+export interface Author {
+  name: string;
+  url?: string;
+  icon_url?: string;
+}
+
+export interface Footer {
+  text: string;
+  icon_url?: string;
 }
 
 export interface IncomingLinearWebhookPayload {
