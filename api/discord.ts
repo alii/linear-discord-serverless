@@ -60,13 +60,7 @@ function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string;
     });
   }
 
-  if (payload.data.assigneeId) {
-    fields.push({
-      name: 'Assigned to',
-      value: payload.data.assigneeId,
-      inline: true,
-    });
-  }
+  // TODO: Add assignee integration
 
   if (payload.data.dueDate) {
     fields.push({
