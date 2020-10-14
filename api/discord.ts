@@ -49,18 +49,7 @@ async function sendIssue(
   const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
 
   const embed = new MessageEmbed()
-    .addFields([
-      {
-        name: "Priority",
-        value: getPriorityValue(payload.data.priority || 0),
-        inline: true,
-      },
-      {
-        name: "Status",
-        value: payload.data.state.name,
-        inline: true,
-      },
-    ])
+    .addField("Status", payload.data.state.name, true)
     .setColor("#4752b2")
     .setAuthor(`Issue Created [${getId(payload.url)}]`)
     .setTitle(payload.data?.title ?? "No Title")
@@ -82,6 +71,11 @@ async function sendIssue(
 
   if (payload.data.estimate) {
     embed.addField("Points", `${payload.data.estimate} points`, true);
+  }
+
+  if (payload.data.estimate) {
+    const value = getPriorityValue(payload.data.priority || 0);
+    embed.addField("Priority", value, true);
   }
 
   const request = await fetch(url, {
