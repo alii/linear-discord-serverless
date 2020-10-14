@@ -27,8 +27,7 @@ export default async function handler(
   }
 
   try {
-    const response = await sendIssue(body, { id, token });
-    console.table({ ...response, id, token });
+    await sendIssue(body, { id, token });
 
     res.json({
       success: true,
