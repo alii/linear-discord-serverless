@@ -29,7 +29,7 @@ export function getPriorityValue(
  * Get the task ID from url
  * @param link task url
  */
-export function getId(link: string) {
+export function getId(link: string): string {
   return link.split('/')[5];
 }
 

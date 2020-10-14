@@ -3,10 +3,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>linear-discord-serverless</title>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet" />
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
       html {
-        font-family: 'PT Mono', monospace;
+        font-family: 'Roboto', sans-serif;
         padding: 10%;
         line-height: 25px;
       }
@@ -16,7 +17,7 @@
       }
 
       input {
-        font-family: 'PT Mono', monospace;
+        font-family: 'Roboto', sans-serif;
         border: none;
         border-bottom: 1px solid gray;
         display: inline-block;
@@ -77,8 +78,23 @@
       congrats: document.getElementById('congrats'),
     };
 
+    /**
+     * Checks if a webhook is valid
+     * @param {string} webhook The webhook
+     * @returns {boolean}
+     */
+    function isWebhook(webhook) {
+      return webhook.startsWith('https://discord') && webhook.includes('.com/api/webhook');
+    }
+
     elements.webhook.input.addEventListener('focus', () => {
       elements.webhook.errorMessage.textContent = '';
+    });
+
+    elements.webhook.input.addEventListener('keyup', (e) => {
+      if (isWebhook(e.target.value)) {
+        e.target.blur();
+      }
     });
 
     elements.webhook.input.addEventListener('blur', (e) => {
@@ -88,11 +104,7 @@
       const split = value.split('/').filter((x) => x.trim() !== '');
       const correctWebhookLength = 6;
 
-      if (
-        split.length !== correctWebhookLength ||
-        !value.startsWith('https://discord') ||
-        !value.includes('.com/api/webhook')
-      ) {
+      if (split.length !== correctWebhookLength || !isWebhook(value)) {
         elements.webhook.errorMessage.textContent = 'That is not a valid webhook URL';
         elements.linear.container.style.visibility = 'hidden';
         return;
