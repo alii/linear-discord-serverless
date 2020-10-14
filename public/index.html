@@ -113,7 +113,7 @@
       const [, , , , id, token] = split;
 
       elements.linear.container.style.visibility = 'visible';
-      elements.linear.result.textContent = `https://lds.alistair.cloud/api/discord?id=${id}&token=${token}`;
+      elements.linear.result.textContent = `https://${window.location.host}/api/discord?id=${id}&token=${token}`;
     });
 
     document.addEventListener('copy', () => {
