@@ -103,6 +103,10 @@ async function sendIssue(payload: Partial<IncomingLinearWebhookPayload>, webhook
 
   const request = await exec(url, embed);
 
+  if (request.status !== 200) {
+    throw new Error('Could not send message to discord.');
+  }
+
   const response = await request.json();
 
   return {
