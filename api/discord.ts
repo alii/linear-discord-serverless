@@ -1,10 +1,15 @@
-import { NowRequest, NowResponse } from '@now/node';
-import moment from 'moment';
-import fetch from 'node-fetch';
-import { DiscordMessage, Field as DiscordField, IncomingLinearWebhookPayload } from './_types';
-import { getId, getPriorityValue, parseLabels } from './_util';
+import { NowRequest, NowResponse } from "@now/node";
+import moment from "moment";
+import fetch from "node-fetch";
+import { MessageEmbed } from "discord.js";
 
-export default async function handler(req: NowRequest, res: NowResponse): Promise<void> {
+import { Root as IncomingLinearWebhookPayload } from "./_types";
+import { getId, getPriorityValue, parseLabels } from "./_util";
+
+export default async function handler(
+  req: NowRequest,
+  res: NowResponse
+): Promise<void> {
   const { id, token } = req.query as {
     id: string;
     token: string;
@@ -12,21 +17,22 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 
   const body = req.body as IncomingLinearWebhookPayload;
 
-  if (body.action !== 'create' || body.type !== 'Issue') {
+  if (body.action !== "create" || body.type !== "Issue") {
     res.json({
       success: false,
-      message: 'This is for creation of issues only!',
+      message: "This is for creation of issues only!",
     });
 
     return;
   }
 
   try {
-    await sendIssue(body, { id, token });
+    const response = await sendIssue(body, { id, token });
+    console.table({ ...response, id, token });
 
     res.json({
       success: true,
-      message: 'Success, webhook has been sent.',
+      message: "Success, webhook has been sent.",
     });
   } catch (e) {
     res.status(500).json({
@@ -36,73 +42,61 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
   }
 }
 
-function sendIssue(payload: IncomingLinearWebhookPayload, webhook: { id: string; token: string }) {
-  const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}`;
+async function sendIssue(
+  payload: IncomingLinearWebhookPayload,
+  webhook: { id: string; token: string }
+) {
+  const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
 
-  const fields: DiscordField[] = [
-    {
-      name: 'Priority',
-      value: getPriorityValue(payload.data.priority || 0),
-      inline: true,
-    },
-    {
-      name: 'Status',
-      value: payload.data.state.name,
-      inline: true,
-    },
-  ];
+  const embed = new MessageEmbed()
+    .addFields([
+      {
+        name: "Priority",
+        value: getPriorityValue(payload.data.priority || 0),
+        inline: true,
+      },
+      {
+        name: "Status",
+        value: payload.data.state.name,
+        inline: true,
+      },
+    ])
+    .setColor("#4752b2")
+    .setAuthor(`Issue Created [${getId(payload.url)}]`)
+    .setTitle(payload.data?.title ?? "No Title")
+    .setURL(payload.url)
+    .setDescription(payload.data.description ?? "")
+    .setTimestamp()
+    .setFooter(
+      "Linear App",
+      "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
+    );
 
   if (payload.data.labels) {
-    fields.push({
-      name: 'Labels',
-      value: parseLabels(payload.data.labels || []),
-      inline: true,
-    });
+    embed.addField("Labels", parseLabels(payload.data.labels || []), true);
   }
 
-  // TODO: Add assignee integration
-
   if (payload.data.dueDate) {
-    fields.push({
-      name: 'Due',
-      value: moment(payload.data.dueDate).format('LLL'),
-      inline: true,
-    });
+    embed.addField("Due", moment(payload.data.dueDate).format("LLL"), true);
   }
 
   if (payload.data.estimate) {
-    fields.push({
-      name: 'Points',
-      value: `${payload.data.estimate} points`,
-      inline: true,
-    });
+    embed.addField("Points", `${payload.data.estimate} points`, true);
   }
 
-  const embed: DiscordMessage = {
-    embeds: [
-      {
-        color: 0x4752b2,
-        author: {
-          name: `Issue Created [${getId(payload.url)}]`,
-        },
-        title: payload.data.title,
-        url: payload.url,
-        description: payload.data.description || '',
-        fields,
-        timestamp: new Date().toString(),
-        footer: {
-          text: `Linear App`,
-          icon_url: 'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png',
-        },
-      },
-    ],
-  };
-
-  const body = JSON.stringify(embed);
-
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
+  const request = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      embeds: [embed.toJSON()],
+    }),
   });
+
+  const response = await request.json();
+
+  return {
+    url,
+    response,
+    status: request.status,
+  };
 }

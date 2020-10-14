@@ -1,21 +1,23 @@
-import { IncomingLinearWebhookPayload } from './_types';
+import { Root as IncomingLinearWebhookPayload } from "./_types";
 
 /**
  * Get the Priority Value translated
  * @param priority number for priority
  */
-export function getPriorityValue(priority: NonNullable<IncomingLinearWebhookPayload['data']['priority']>) {
+export function getPriorityValue(
+  priority: NonNullable<IncomingLinearWebhookPayload["data"]["priority"]>
+) {
   switch (priority) {
     case 0:
-      return 'None';
+      return "None";
     case 1:
-      return 'Urgent';
+      return "Urgent";
     case 2:
-      return 'High';
+      return "High";
     case 3:
-      return 'Medium';
+      return "Medium";
     case 4:
-      return 'Low';
+      return "Low";
   }
 }
 
@@ -24,13 +26,15 @@ export function getPriorityValue(priority: NonNullable<IncomingLinearWebhookPayl
  * @param link task url
  */
 export function getId(link: string) {
-  return link.split('/')[5];
+  return link.split("/")[5];
 }
 
 /**
  * Formats and prettifies label(s)
  * @param labels connected labels
  */
-export function parseLabels(labels: NonNullable<IncomingLinearWebhookPayload['data']['labels']>) {
-  return labels.map((label) => label.name).join(', ');
+export function parseLabels(
+  labels: NonNullable<IncomingLinearWebhookPayload["data"]["labels"]>
+) {
+  return labels.map((label) => label.name).join(", ");
 }
