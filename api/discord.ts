@@ -35,6 +35,9 @@ export default async function handler(
       message: "Success, webhook has been sent.",
     });
   } catch (e) {
+    const url = `https://discord.com/api/webhooks/${id}/${token}?wait=true`;
+    await exec(url, error(e.message));
+
     res.status(500).json({
       success: false,
       message: `Node.js runtime error: ${e.message}`,
