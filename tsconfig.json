@@ -3,9 +3,8 @@
     "module": "commonjs",
     "target": "es5",
     "sourceMap": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strict": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

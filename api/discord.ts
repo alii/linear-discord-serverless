@@ -1,7 +1,7 @@
 import { NowRequest, NowResponse } from "@now/node";
 import moment from "moment";
 import fetch from "node-fetch";
-import { MessageEmbed } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 
 import { Root as IncomingLinearWebhookPayload } from "./_types";
 import { getId, getPriorityValue, parseLabels } from "./_util";
@@ -15,7 +15,7 @@ export default async function handler(
     token: string;
   };
 
-  const body = req.body as IncomingLinearWebhookPayload;
+  const body = req.body as Partial<IncomingLinearWebhookPayload>;
 
   if (body.action !== "create" || body.type !== "Issue") {
     res.json({
@@ -42,17 +42,53 @@ export default async function handler(
   }
 }
 
+function error(message: string): MessageEmbed {
+  return new MessageEmbed()
+    .setTitle("Something went wrong")
+    .setDescription(message)
+    .setColor("#ff6363")
+    .setFooter(
+      "Linear App",
+      "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
+    )
+    .setTimestamp()
+    .setAuthor(
+      "Uh oh...",
+      "https://cdn.icon-icons.com/icons2/1380/PNG/512/vcsconflicting_93497.png"
+    );
+}
+
+function exec(url: string, embed: MessageEmbed) {
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      embeds: [embed.toJSON()],
+    }),
+  });
+}
+
 async function sendIssue(
-  payload: IncomingLinearWebhookPayload,
+  payload: Partial<IncomingLinearWebhookPayload>,
   webhook: { id: string; token: string }
 ) {
   const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
+
+  if (!payload.data) {
+    await exec(url, error("Issue data was not sent"));
+    return;
+  }
+
+  if (!payload.url) {
+    await exec(url, error("Issue URL was not sent"));
+    return;
+  }
 
   const embed = new MessageEmbed()
     .addField("Status", payload.data.state.name, true)
     .setColor("#4752b2")
     .setAuthor(`Issue Created [${getId(payload.url)}]`)
-    .setTitle(payload.data?.title ?? "No Title")
+    .setTitle(payload.data.title ?? "No Title")
     .setURL(payload.url)
     .setDescription(payload.data.description ?? "")
     .setTimestamp()
@@ -78,13 +114,7 @@ async function sendIssue(
     embed.addField("Priority", value, true);
   }
 
-  const request = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      embeds: [embed.toJSON()],
-    }),
-  });
+  const request = await exec(url, embed);
 
   const response = await request.json();
 
