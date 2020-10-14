@@ -100,19 +100,19 @@ async function sendIssue(
       "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
     );
 
-  if (payload.data.labels) {
+  if (payload.data.labels && payload.data.labels.length > 0) {
     embed.addField("Labels", parseLabels(payload.data.labels || []), true);
   }
 
-  if (payload.data.dueDate) {
+  if (payload.data.dueDate && moment.isDate(payload.data.dueDate)) {
     embed.addField("Due", moment(payload.data.dueDate).format("LLL"), true);
   }
 
-  if (payload.data.estimate) {
+  if (payload.data.estimate && !isNaN(payload.data.estimate)) {
     embed.addField("Points", `${payload.data.estimate} points`, true);
   }
 
-  if (payload.data.estimate) {
+  if (payload.data.priority && !isNaN(payload.data.priority)) {
     const value = getPriorityValue(payload.data.priority || 0);
     embed.addField("Priority", value, true);
   }
