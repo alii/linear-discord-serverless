@@ -93,7 +93,7 @@ async function sendIssue(payload: Partial<IncomingLinearWebhookPayload>, webhook
   }
 
   if (payload.data.estimate && !isNaN(payload.data.estimate)) {
-    embed.addField('Points', `${payload.data.estimate} points`, true);
+    embed.addField('Estimate', `Level: ${payload.data.estimate}`, true);
   }
 
   if (payload.data.priority && !isNaN(payload.data.priority)) {
