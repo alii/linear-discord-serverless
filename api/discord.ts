@@ -88,7 +88,7 @@ async function sendIssue(payload: Partial<IncomingLinearWebhookPayload>, webhook
 
   const embed = new MessageEmbed()
     .addField('Status', payload.data.state.name, true)
-    .setColor(type === 'Create' ? '#4752b2' : '#47b274')
+    .setColor(payload.data?.state?.color ?? '#4752b2')
     .setAuthor(`Issue ${type}d [${getId(payload.url)}]`)
     .setTitle(payload.data.title ?? 'No Title')
     .setURL(payload.url)
