@@ -14,10 +14,20 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
 
   const body = req.body as Partial<IncomingLinearWebhookPayload>;
 
-  if (body.action !== 'create' || body.type !== 'Issue') {
+  if (!body.type || !body.action || !body.data) {
+    return void res.status(422).json({
+      success: false,
+      message: 'No body sent',
+    });
+  }
+
+  const isIssue = body.type === 'Issue';
+  const isCreateOrUpdate = ['create', 'update'].includes(body.action);
+
+  if (!isCreateOrUpdate || !isIssue) {
     res.json({
       success: false,
-      message: 'This is for creation of issues only!',
+      message: 'This is for creation or update of issues only!',
     });
 
     return;
@@ -74,15 +84,17 @@ async function sendIssue(payload: Partial<IncomingLinearWebhookPayload>, webhook
     return;
   }
 
+  const type: 'Update' | 'Create' = payload.action === 'create' ? 'Create' : 'Update';
+
   const embed = new MessageEmbed()
     .addField('Status', payload.data.state.name, true)
     .setColor('#4752b2')
-    .setAuthor(`Issue Created [${getId(payload.url)}]`)
+    .setAuthor(`Issue ${type}d [${getId(payload.url)}]`)
     .setTitle(payload.data.title ?? 'No Title')
     .setURL(payload.url)
     .setDescription(payload.data.description ?? '')
     .setTimestamp()
-    .setFooter('Linear App', 'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png');
+    .setFooter(`Linear App • ${type}`, 'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png');
 
   if (payload.data.labels && payload.data.labels.length > 0) {
     embed.addField('Labels', parseLabels(payload.data.labels || []), true);
