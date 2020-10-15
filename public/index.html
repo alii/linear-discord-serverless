@@ -31,10 +31,29 @@
       #linear-webhook-result {
         color: blue;
       }
+
+      svg {
+        height: 24px;
+        width: 24px;
+      }
+
+      input::placeholder {
+        color: rgb(186, 186, 186);
+      }
     </style>
   </head>
   <body>
-    <h1>linear-discord-serverless</h1>
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+        />
+      </svg>
+      linear-discord-serverless
+    </h1>
     <h3>Installation instructions</h3>
     <ol>
       <li>
@@ -43,11 +62,11 @@
           <li>Open Discord</li>
           <li>Open channel settings for the channel you want to receive notifications in</li>
           <li>Hit "integrations" and then "webhooks"</li>
-          <li>Create a new webhook. Call it whatever you want and set the profile picture</li>
+          <li>Create a new webhook. Name it whatever you want and set the profile picture</li>
           <li>Copy the webhook URL</li>
           <li>
             Paste it here:
-            <input type="text" id="webhook-input" />
+            <input type="text" id="webhook-input" placeholder="https://discord.com/api/..." />
             <span id="webhook-error"></span>
           </li>
         </ol>
