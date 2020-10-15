@@ -3,10 +3,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>linear-discord-serverless</title>
-    <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet" />
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
       html {
-        font-family: 'PT Mono', monospace;
+        font-family: 'Roboto', sans-serif;
         padding: 10%;
         line-height: 25px;
       }
@@ -16,7 +17,7 @@
       }
 
       input {
-        font-family: 'PT Mono', monospace;
+        font-family: 'Roboto', sans-serif;
         border: none;
         border-bottom: 1px solid gray;
         display: inline-block;
@@ -30,10 +31,29 @@
       #linear-webhook-result {
         color: blue;
       }
+
+      svg {
+        height: 24px;
+        width: 24px;
+      }
+
+      input::placeholder {
+        color: rgb(186, 186, 186);
+      }
     </style>
   </head>
   <body>
-    <h1>linear-discord-serverless</h1>
+    <h1>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+        />
+      </svg>
+      linear-discord-serverless
+    </h1>
     <h3>Installation instructions</h3>
     <ol>
       <li>
@@ -42,11 +62,11 @@
           <li>Open Discord</li>
           <li>Open channel settings for the channel you want to receive notifications in</li>
           <li>Hit "integrations" and then "webhooks"</li>
-          <li>Create a new webhook. Call it whatever you want and set the profile picture</li>
+          <li>Create a new webhook. Name it whatever you want and set the profile picture</li>
           <li>Copy the webhook URL</li>
           <li>
             Paste it here:
-            <input type="text" id="webhook-input" />
+            <input type="text" id="webhook-input" placeholder="https://discord.com/api/..." />
             <span id="webhook-error"></span>
           </li>
         </ol>
@@ -77,8 +97,23 @@
       congrats: document.getElementById('congrats'),
     };
 
+    /**
+     * Checks if a webhook is valid
+     * @param {string} webhook The webhook
+     * @returns {boolean}
+     */
+    function isWebhook(webhook) {
+      return webhook.startsWith('https://discord') && webhook.includes('.com/api/webhook');
+    }
+
     elements.webhook.input.addEventListener('focus', () => {
       elements.webhook.errorMessage.textContent = '';
+    });
+
+    elements.webhook.input.addEventListener('keyup', (e) => {
+      if (isWebhook(e.target.value)) {
+        e.target.blur();
+      }
     });
 
     elements.webhook.input.addEventListener('blur', (e) => {
@@ -88,11 +123,7 @@
       const split = value.split('/').filter((x) => x.trim() !== '');
       const correctWebhookLength = 6;
 
-      if (
-        split.length !== correctWebhookLength ||
-        !value.startsWith('https://discord') ||
-        !value.includes('.com/api/webhook')
-      ) {
+      if (split.length !== correctWebhookLength || !isWebhook(value)) {
         elements.webhook.errorMessage.textContent = 'That is not a valid webhook URL';
         elements.linear.container.style.visibility = 'hidden';
         return;
@@ -101,7 +132,7 @@
       const [, , , , id, token] = split;
 
       elements.linear.container.style.visibility = 'visible';
-      elements.linear.result.textContent = `https://lds.alistair.cloud/api/discord?id=${id}&token=${token}`;
+      elements.linear.result.textContent = `https://${window.location.host}/api/discord?id=${id}&token=${token}`;
     });
 
     document.addEventListener('copy', () => {
