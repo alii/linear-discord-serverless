@@ -25,18 +25,16 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
   const isCreateOrUpdate = ['create', 'update'].includes(body.action);
 
   if (!isCreateOrUpdate || !isIssue) {
-    res.json({
+    return void res.json({
       success: false,
       message: 'This is for creation or update of issues only!',
     });
-
-    return;
   }
 
   try {
     await sendIssue(body, { id, token });
 
-    res.json({
+    return void res.json({
       success: true,
       message: 'Success, webhook has been sent.',
     });
@@ -44,7 +42,7 @@ export default async function handler(req: NowRequest, res: NowResponse): Promis
     const url = `https://discord.com/api/webhooks/${id}/${token}?wait=true`;
     await exec(url, error(e.message));
 
-    res.status(500).json({
+    return void res.status(500).json({
       success: false,
       message: `Node.js runtime error: ${e.message}`,
     });
