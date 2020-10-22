@@ -1,7 +1,7 @@
 export interface Root {
-  action: 'create' | 'update' | 'remove' | string;
+  action: "create" | "update" | "remove" | string;
   data: Data;
-  type: 'Issue' | string;
+  type: "Issue" | string;
   createdAt: string;
   url: string;
 }
@@ -10,7 +10,7 @@ export interface Data {
   id: string;
   title: string;
   subscriberIds: string[];
-  previousIdentifiers: Data['id'][];
+  previousIdentifiers: Data["id"][];
   createdAt: string;
   updatedAt: string;
   archivedAt: string;
