@@ -1,23 +1,27 @@
 import { NowRequest, NowResponse } from "@now/node";
-import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
-import moment from "moment";
 
 import { Root as IncomingLinearWebhookPayload } from "./_types";
-import { getId, getPriorityValue, parseLabels } from "./_util";
+import { error, exec, sendIssue } from "./_util";
 
 export default async function handler(
   req: NowRequest,
   res: NowResponse
 ): Promise<void> {
+  if (!req.method || req.method.toUpperCase() !== "POST") {
+    return void res.status(405).json({
+      success: false,
+      message: `Cannot ${req.method} this endpoint. Must be POST`,
+    });
+  }
+
   const { id, token } = req.query as {
     id: string;
     token: string;
   };
 
-  const body = req.body as Partial<IncomingLinearWebhookPayload>;
+  const body = req.body as Partial<IncomingLinearWebhookPayload> | undefined;
 
-  if (!body.type || !body.action || !body.data) {
+  if (!body || !body.type || !body.action || !body.data) {
     return void res.status(422).json({
       success: false,
       message: "No body sent",
@@ -42,107 +46,12 @@ export default async function handler(
       message: "Success, webhook has been sent.",
     });
   } catch (e) {
-    const url = `https://discord.com/api/webhooks/${id}/${token}?wait=true`;
+    const url = `https://discord.com/api/webhooks/${id}/${token}`;
     await exec(url, error(e.message));
 
     return void res.status(500).json({
       success: false,
-      message: `Node.js runtime error: ${e.message}`,
+      message: `Something went wrong: ${e.message}`,
     });
   }
-}
-
-function error(message: string): MessageEmbed {
-  return new MessageEmbed()
-    .setTitle("Something went wrong")
-    .setDescription(message)
-    .setColor("#ff6363")
-    .setFooter(
-      "Linear App",
-      "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
-    )
-    .setTimestamp()
-    .setAuthor(
-      "Uh oh...",
-      "https://cdn.icon-icons.com/icons2/1380/PNG/512/vcsconflicting_93497.png"
-    );
-}
-
-function exec(url: string, embed: MessageEmbed) {
-  return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      embeds: [embed.toJSON()],
-    }),
-  });
-}
-
-async function sendIssue(
-  payload: Partial<IncomingLinearWebhookPayload>,
-  webhook: { id: string; token: string }
-) {
-  const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
-
-  if (!payload.data) {
-    await exec(url, error("Issue data was not sent"));
-    return;
-  }
-
-  if (!payload.url) {
-    await exec(url, error("Issue URL was not sent"));
-    return;
-  }
-
-  const type: "Update" | "Create" =
-    payload.action === "create" ? "Create" : "Update";
-
-  const embed = new MessageEmbed()
-    .addField("Status", payload.data.state.name, true)
-    .setColor(payload.data?.state?.color ?? "#4752b2")
-    .setAuthor(`Issue ${type}d [${getId(payload.url)}]`)
-    .setTitle(payload.data.title ?? "No Title")
-    .setURL(payload.url)
-    .setDescription(payload.data.description ?? "")
-    .setTimestamp()
-    .setFooter(
-      `Linear App • ${type}`,
-      "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
-    );
-
-  if (payload.data.labels && payload.data.labels.length > 0) {
-    embed.addField("Labels", parseLabels(payload.data.labels || []), true);
-  }
-
-  if (payload.data.dueDate) {
-    try {
-      const dueDate = moment(payload.data.dueDate, "YYYY-MM-DD", true);
-      embed.addField("Due", dueDate.format("LLL"), true);
-    } catch (e) {
-      await exec(url, error("Could not add date."));
-    }
-  }
-
-  if (payload.data.estimate && !isNaN(payload.data.estimate)) {
-    embed.addField("Estimate", `Level: ${payload.data.estimate}`, true);
-  }
-
-  if (payload.data.priority && !isNaN(payload.data.priority)) {
-    const value = getPriorityValue(payload.data.priority || 0);
-    embed.addField("Priority", value, true);
-  }
-
-  const request = await exec(url, embed);
-
-  if (request.status !== 200) {
-    throw new Error("Could not send message to discord.");
-  }
-
-  const response = await request.json();
-
-  return {
-    url,
-    response,
-    status: request.status,
-  };
 }
