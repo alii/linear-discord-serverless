@@ -56,6 +56,10 @@ export function parseImages(
   images: string[];
   content: string;
 } {
+  if (content.trim() === "") {
+    return { images: [], content };
+  }
+
   return {
     images:
       content.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif|webm)\S*)\b/g) || [],
@@ -138,7 +142,7 @@ export async function sendIssue(
     embed.addField("Priority", value, true);
   }
 
-  const { images, content } = parseImages(payload.data.description);
+  const { images, content } = parseImages(payload.data.description || "");
 
   embed.setDescription(content);
 

@@ -6,7 +6,7 @@ export interface Root {
   url: string;
 }
 
-export interface Data {
+export type Data = {
   id: string;
   title: string;
   subscriberIds: string[];
@@ -15,7 +15,7 @@ export interface Data {
   updatedAt: string;
   archivedAt: string;
   number: number;
-  description: string;
+  description?: string;
   documentVersion: number;
   priority: number;
   estimate: number;
@@ -40,7 +40,7 @@ export interface Data {
   labels: Label[];
   team: Team;
   state: State;
-}
+};
 
 export interface Label {
   id: string;
