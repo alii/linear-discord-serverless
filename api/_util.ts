@@ -33,7 +33,7 @@ export function getPriorityValue(
  * @param link task url
  */
 export function getId(link: string): string {
-  return link.split("/")[5];
+  return link.split("/")[5].split("#")[0];
 }
 
 /**
@@ -104,7 +104,7 @@ export async function sendComment(
   const embed = new MessageEmbed()
     .setDescription(payload.body)
     .setColor("#4752b2")
-    .setAuthor(`Issue ${type}d [${getId(metadata.url)}]`)
+    .setAuthor(`Comment ${type}d [${getId(metadata.url)}]`)
     .setTitle("A comment was added")
     .setURL(metadata.url)
     .addField(
