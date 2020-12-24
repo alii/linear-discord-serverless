@@ -1,7 +1,7 @@
 import { NowRequest, NowResponse } from "@now/node";
 
-import { Root as IncomingLinearWebhookPayload } from "./_types";
-import { error, exec, sendIssue } from "./_util";
+import { RequestBody as IncomingLinearWebhookPayload } from "./_types";
+import { error, exec, sendComment, sendIssue } from "./_util";
 
 export default async function handler(
   req: NowRequest,
@@ -28,18 +28,43 @@ export default async function handler(
     });
   }
 
-  const isIssue = body.type === "Issue";
-  const isCreateOrUpdate = ["create", "update"].includes(body.action);
-
-  if (!isCreateOrUpdate || !isIssue) {
+  if (!["create", "update"].includes(body.action)) {
     return void res.json({
       success: false,
       message: "This is for creation or update of issues only!",
     });
   }
 
+  if (!body.data) {
+    return void res.json({
+      success: false,
+      message: "Issue data was not sent",
+    });
+  }
+
+  if (!body.url) {
+    return void res.json({
+      success: false,
+      message: "No Issue URL was sent",
+    });
+  }
+
+  const options = [
+    { action: body.action, url: body.url },
+    { id, token },
+  ] as const;
+
   try {
-    await sendIssue(body, { id, token });
+    if (body.type === "Issue") {
+      await sendIssue(body.data, ...options);
+    } else if (body.type === "Comment") {
+      await sendComment(body.data, ...options);
+    } else {
+      return void res.json({
+        success: false,
+        message: "You ",
+      });
+    }
 
     return void res.json({
       success: true,

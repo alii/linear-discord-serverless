@@ -1,4 +1,4 @@
-import { Root as IncomingLinearWebhookPayload } from "./_types";
+import { Comment, Issue, Action } from "./_types";
 import { MessageEmbed } from "discord.js";
 import fetch from "node-fetch";
 import moment from "moment";
@@ -10,7 +10,7 @@ export type StringPriority = "None" | "Urgent" | "High" | "Medium" | "Low";
  * @param priority number for priority
  */
 export function getPriorityValue(
-  priority: NonNullable<IncomingLinearWebhookPayload["data"]["priority"]>
+  priority: NonNullable<Issue["priority"]>
 ): StringPriority {
   switch (priority) {
     case 0:
@@ -40,9 +40,7 @@ export function getId(link: string): string {
  * Formats and prettifies label(s)
  * @param labels connected labels
  */
-export function parseLabels(
-  labels: NonNullable<IncomingLinearWebhookPayload["data"]["labels"]>
-) {
+export function parseLabels(labels: NonNullable<Issue["labels"]>) {
   return labels.map((label) => label.name).join(", ");
 }
 
@@ -93,56 +91,88 @@ export function exec(url: string, embed: MessageEmbed) {
   });
 }
 
+export async function sendComment(
+  payload: Comment,
+  metadata: { action: Action; url: string },
+  webhook: { id: String; token: String }
+) {
+  const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
+
+  const type: "Update" | "Create" =
+    metadata.action === "create" ? "Create" : "Update";
+
+  const embed = new MessageEmbed()
+    .setDescription(payload.body)
+    .setColor("#4752b2")
+    .setAuthor(`Issue ${type}d [${getId(metadata.url)}]`)
+    .setTitle("A comment was added")
+    .setURL(metadata.url)
+    .addField("Reactions", payload.reactionData.length)
+    .addField("Edited", payload.edited ? "Yes" : "No")
+    .setTimestamp(moment(payload.createdAt).toDate())
+    .setFooter(
+      `Linear App • ${type}`,
+      "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
+    );
+
+  const request = await exec(url, embed);
+
+  if (request.status !== 200) {
+    throw new Error(`Could not send message to discord. \`${request.status}\``);
+  }
+
+  const response = await request.json();
+
+  return {
+    url,
+    response,
+    status: request.status,
+  };
+}
+
 export async function sendIssue(
-  payload: Partial<IncomingLinearWebhookPayload>,
+  payload: Partial<Issue>,
+  metadata: { action: Action; url: string },
   webhook: { id: string; token: string }
 ) {
   const url = `https://discord.com/api/webhooks/${webhook.id}/${webhook.token}?wait=true`;
 
-  if (!payload.data) {
-    throw new Error("Issue data was not sent");
-  }
-
-  if (!payload.url) {
-    throw new Error("Issue URL was not sent");
-  }
-
   const type: "Update" | "Create" =
-    payload.action === "create" ? "Create" : "Update";
+    metadata.action === "create" ? "Create" : "Update";
 
   const embed = new MessageEmbed()
-    .addField("Status", payload.data.state.name, true)
-    .setColor(payload.data?.state?.color ?? "#4752b2")
-    .setAuthor(`Issue ${type}d [${getId(payload.url)}]`)
-    .setTitle(payload.data.title ?? "No Title")
-    .setURL(payload.url)
+    .addField("Status", payload.state?.name ?? "Backlog", true)
+    .setColor(payload?.state?.color ?? "#4752b2")
+    .setAuthor(`Issue ${type}d [${getId(metadata.url)}]`)
+    .setTitle(payload.title ?? "No Title")
+    .setURL(metadata.url)
     .setTimestamp()
     .setFooter(
       `Linear App • ${type}`,
       "https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png"
     );
 
-  if (payload.data.labels && payload.data.labels.length > 0) {
-    embed.addField("Labels", parseLabels(payload.data.labels), true);
+  if (payload.labels && payload.labels.length > 0) {
+    embed.addField("Labels", parseLabels(payload.labels), true);
   }
 
-  if (payload.data.dueDate) {
+  if (payload.dueDate) {
     try {
-      const dueDate = moment(payload.data.dueDate, "YYYY-MM-DD", true);
+      const dueDate = moment(payload.dueDate, "YYYY-MM-DD", true);
       embed.addField("Due", dueDate.format("LLL"), true);
     } catch (e) {}
   }
 
-  if (payload.data.estimate && !isNaN(payload.data.estimate)) {
-    embed.addField("Estimate", `Level: ${payload.data.estimate}`, true);
+  if (payload.estimate && !isNaN(payload.estimate)) {
+    embed.addField("Estimate", `Level: ${payload.estimate}`, true);
   }
 
-  if (payload.data.priority && !isNaN(payload.data.priority)) {
-    const value = getPriorityValue(payload.data.priority || 0);
+  if (payload.priority && !isNaN(payload.priority)) {
+    const value = getPriorityValue(payload.priority || 0);
     embed.addField("Priority", value, true);
   }
 
-  const { images, content } = parseImages(payload.data.description || "");
+  const { images, content } = parseImages(payload.description || "");
 
   embed.setDescription(content);
 

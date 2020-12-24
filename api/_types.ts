@@ -1,16 +1,25 @@
-export interface Root {
-  action: "create" | "update" | "remove" | string;
-  data: Data;
-  type: "Issue" | string;
+export type Action = "create" | "update" | "remove" | string;
+
+export type RequestBody = {
+  action: Action;
   createdAt: string;
   url: string;
-}
+} & (
+  | {
+      type: "Issue";
+      data: Issue;
+    }
+  | {
+      type: "Comment";
+      data: Comment;
+    }
+);
 
-export type Data = {
+export type Issue = {
   id: string;
   title: string;
   subscriberIds: string[];
-  previousIdentifiers: Data["id"][];
+  previousIdentifiers: Issue["id"][];
   createdAt: string;
   updatedAt: string;
   archivedAt: string;
@@ -41,6 +50,19 @@ export type Data = {
   team: Team;
   state: State;
 };
+
+export interface Comment {
+  id: string;
+  reactionData: unknown[];
+  createdAt: string;
+  updatedAt: string;
+  archivedAt: string;
+  body: string;
+  issueId: string;
+  userId: string;
+  editedAt: string;
+  edited: boolean;
+}
 
 export interface Label {
   id: string;
