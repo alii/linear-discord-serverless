@@ -107,8 +107,12 @@ export async function sendComment(
     .setAuthor(`Issue ${type}d [${getId(metadata.url)}]`)
     .setTitle("A comment was added")
     .setURL(metadata.url)
-    .addField("Reactions", payload.reactionData.length)
-    .addField("Edited", payload.edited ? "Yes" : "No")
+    .addField(
+      "Reactions",
+      payload.reactionData.length ? "None" : payload.reactionData.length,
+      true
+    )
+    .addField("Edited", payload.edited ? "Yes" : "No", true)
     .setTimestamp(moment(payload.createdAt).toDate())
     .setFooter(
       `Linear App • ${type}`,
