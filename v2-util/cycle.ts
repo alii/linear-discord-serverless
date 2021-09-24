@@ -1,13 +1,13 @@
 import {z} from 'zod';
-import {createAllStates, dateSchema, defaultRemoveSchema} from './util';
+import {createAllStates, dateResolvable, defaultRemoveSchema} from './util';
 
 const commons = z.object({
 	id: z.string().uuid(),
-	createdAt: dateSchema,
-	updatedAt: dateSchema,
+	createdAt: dateResolvable,
+	updatedAt: dateResolvable,
 	number: z.number(),
-	startsAt: dateSchema,
-	endsAt: dateSchema,
+	startsAt: dateResolvable,
+	endsAt: dateResolvable,
 	// TODO(@alii): Find types for these
 	issueCountHistory: z.array(z.unknown()),
 	completedIssueCountHistory: z.array(z.unknown()),

@@ -6,11 +6,11 @@ import {issue} from './issue';
 import {issueLabel} from './issue-label';
 import {project} from './project';
 import {reaction} from './reaction';
-import {dateSchema, defaultAction} from './util';
+import {dateResolvable, defaultAction} from './util';
 
 const commons = z.object({
 	organizationId: z.string().uuid(),
-	createdAt: dateSchema,
+	createdAt: dateResolvable,
 	action: defaultAction,
 });
 

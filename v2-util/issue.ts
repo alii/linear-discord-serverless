@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {createAllStates, dateSchema, defaultRemoveSchema} from './util';
+import {createAllStates, dateResolvable, defaultRemoveSchema} from './util';
 
 const team = z.object({
 	id: z.string().uuid(),
@@ -22,8 +22,8 @@ const state = z.object({
 
 const commons = z.object({
 	id: z.string().uuid(),
-	createdAt: dateSchema,
-	updatedAt: dateSchema,
+	createdAt: dateResolvable,
+	updatedAt: dateResolvable,
 	number: z.number().positive(),
 	title: z.string(),
 	description: z.string(),

@@ -1,10 +1,10 @@
 import {z} from 'zod';
-import {createAllStates, dateSchema, defaultRemoveSchema} from './util';
+import {createAllStates, dateResolvable, defaultRemoveSchema} from './util';
 
 const commons = z.object({
 	id: z.string().uuid(),
-	createdAt: dateSchema,
-	updatedAt: dateSchema,
+	createdAt: dateResolvable,
+	updatedAt: dateResolvable,
 	emoji: z.string(),
 	userId: z.string().uuid(),
 	commentId: z.string().uuid(),
