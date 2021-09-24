@@ -19,6 +19,7 @@ const enum Colors {
 	WARN = '#d9aa58',
 }
 
+const avatar = 'https://lds.alistair.cloud/linear.png';
 const footer = '⚡️ powered by lds.alistair.cloud';
 
 export default api({
@@ -48,7 +49,7 @@ export default api({
 
 		const embed = new MessageEmbed()
 			.setColor(Colors.LINEAR_PURPLE)
-			.setFooter(footer)
+			.setFooter(footer, avatar)
 			.setTimestamp(body.data.updatedAt);
 
 		switch (body.type) {
@@ -90,7 +91,7 @@ export default api({
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				embeds: [embed.toJSON()],
-				avatar_url: 'https://lds.alistair.cloud/linear.png',
+				avatar_url: avatar,
 			}),
 		});
 	},
