@@ -4,5 +4,13 @@
 	"trailingComma": "all",
 	"arrowParens": "avoid",
 	"bracketSpacing": false,
-	"singleQuote": true
+	"singleQuote": true,
+	"overrides": [
+		{
+			"files": "**/*.html",
+			"options": {
+				"printWidth": 400
+			}
+		}
+	]
 }

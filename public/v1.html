@@ -7,18 +7,8 @@
 	</head>
 	<body>
 		<h1>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-				/>
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
 			</svg>
 			linear-discord-serverless
 		</h1>
@@ -28,23 +18,13 @@
 				Create a Discord Webhook
 				<ol>
 					<li>Open Discord</li>
-					<li>
-						Open channel settings for the channel you want to receive
-						notifications in
-					</li>
+					<li>Open channel settings for the channel you want to receive notifications in</li>
 					<li>Hit "integrations" and then "webhooks"</li>
-					<li>
-						Create a new webhook. Name it whatever you want and set the profile
-						picture
-					</li>
+					<li>Create a new webhook. Name it whatever you want and set the profile picture</li>
 					<li>Copy the webhook URL</li>
 					<li>
 						Paste it here:
-						<input
-							type="text"
-							id="webhook-input"
-							placeholder="https://discord.com/api/..."
-						/>
+						<input type="text" id="webhook-input" placeholder="https://discord.com/api/..." />
 						<span id="webhook-error"></span>
 					</li>
 				</ol>
@@ -81,10 +61,7 @@
 		 * @returns {boolean}
 		 */
 		function isWebhook(webhook) {
-			return (
-				webhook.startsWith('https://discord') &&
-				webhook.includes('.com/api/webhook')
-			);
+			return webhook.startsWith('https://discord') && webhook.includes('.com/api/webhook');
 		}
 
 		elements.webhook.input.addEventListener('focus', () => {
@@ -105,8 +82,7 @@
 			const correctWebhookLength = 6;
 
 			if (split.length !== correctWebhookLength || !isWebhook(value)) {
-				elements.webhook.errorMessage.textContent =
-					'That is not a valid webhook URL';
+				elements.webhook.errorMessage.textContent = 'That is not a valid webhook URL';
 				elements.linear.container.style.visibility = 'hidden';
 				return;
 			}

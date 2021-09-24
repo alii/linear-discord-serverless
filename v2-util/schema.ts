@@ -1,4 +1,4 @@
-import {z, ZodSchema} from 'zod';
+import {z} from 'zod';
 import day from 'dayjs';
 
 const date = z.date().or(z.string().transform(str => day(str).toDate()));
