@@ -46,18 +46,31 @@ export default api({
 
 		const body = bodySchema.parse(req.body);
 
-		const embed = new MessageEmbed().setColor(Colors.LINEAR_PURPLE);
+		const embed = new MessageEmbed()
+			.setColor(Colors.LINEAR_PURPLE)
+			.setFooter(footer)
+			.setTimestamp(body.data.updatedAt);
 
 		switch (body.type) {
 			case 'Comment': {
 				const author = await client.user(body.data.userId);
 
 				embed
-					.setTitle(`Comment ${body.action} by ${author.name}.`)
+					.setTitle(`Comment ${body.action}d by ${author.name}.`)
 					.setDescription(body.data.body)
-					.setTimestamp(body.data.updatedAt)
-					.setFooter(footer)
 					.setAuthor(author.name, author.avatarUrl);
+
+				break;
+			}
+
+			case 'Reaction': {
+				const author = await client.user(body.data.userId);
+				const comment = await client.comment(body.data.commentId);
+
+				embed
+					.setTitle(`Reaction ${body.action}d by ${author.name}.`)
+					.addField('Comment', `[Click Here](${comment.url})`, true)
+					.addField('Emoji', `:${body.data.emoji}:`, true);
 
 				break;
 			}
