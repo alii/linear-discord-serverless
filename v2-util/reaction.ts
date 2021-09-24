@@ -20,7 +20,5 @@ const commons = z.object({
 });
 
 export const reaction = createAllStates(commons, defaultRemoveSchema).and(
-	z.object({
-		type: z.literal('Reaction'),
-	}),
+	z.object({type: z.literal('Reaction')}),
 );

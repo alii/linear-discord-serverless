@@ -18,4 +18,6 @@ const commons = z.object({
 	uncompletedIssuesUponCloseIds: z.array(z.unknown()),
 });
 
-export const cycle = createAllStates(commons, defaultRemoveSchema);
+export const cycle = createAllStates(commons, defaultRemoveSchema).and(
+	z.object({type: z.literal('Cycle')}),
+);
