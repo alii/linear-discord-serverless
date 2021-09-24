@@ -1,6 +1,7 @@
 import {LinearClient} from '@linear/sdk';
 import {api, HttpException} from 'nextkit';
-import {z} from 'zod';
+import {z, ZodError} from 'zod';
+import {bodySchema} from '../v2-util/schema';
 
 const querySchema = z.object({
 	api: z.string(),
@@ -8,31 +9,48 @@ const querySchema = z.object({
 	id: z.string(),
 });
 
-export default api({
-	async GET(req) {
-		// Linear's trusted ip range, this comes from
-		// https://developers.linear.app/docs/graphql/webhooks#how-does-a-webhook-work
-		const ip = z
-			.enum(['35.231.147.226', '35.243.134.228'])
-			.safeParse(req.headers['x-vercel-forwarded-for']);
+export default api(
+	{
+		async GET(req) {
+			// Linear's trusted ip range, this comes from
+			// https://developers.linear.app/docs/graphql/webhooks#how-does-a-webhook-work
+			const {success} = z
+				.enum(['35.231.147.226', '35.243.134.228'])
+				.safeParse(req.headers['x-vercel-forwarded-for']);
 
-		if (!ip.success) {
-			throw new HttpException(400, 'This request came from an untrusted ip.');
-		}
+			if (!success && process.env.NODE_ENV !== 'development') {
+				throw new HttpException(400, 'sus');
+			}
 
-		const query = querySchema.safeParse(req.query);
+			const {
+				token: webhookToken,
+				id: webhookId,
+				api,
+			} = querySchema.parse(req.query);
 
-		if (!query.success) {
-			throw new HttpException(400, 'You are missing query parameters!');
-		}
+			const client = new LinearClient({
+				apiKey: api,
+				headers: {'User-Agent': 'github.com/alii/linear-discord-serverless'},
+			});
 
-		const {token, id, api} = query.data;
+			const body = bodySchema.parse(req.body);
 
-		const client = new LinearClient({
-			apiKey: api,
-			headers: {'User-Agent': 'github.com/alii/linear-discord-serverless'},
-		});
-
-		return {success: true};
+			return {success: true};
+		},
 	},
-});
+	e => {
+		if (e instanceof Error) {
+			if (e instanceof ZodError) {
+				return console.log(
+					e.issues.map(issue => `${issue.path} is ${issue.message}`).join(', '),
+				);
+			}
+
+			console.log(e.message);
+		}
+
+		if (typeof e === 'string') {
+			console.log(e);
+		}
+	},
+);
