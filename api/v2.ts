@@ -1,5 +1,5 @@
 import {LinearClient} from '@linear/sdk';
-import {MessageEmbed} from 'discord.js';
+import {EmbedField, MessageEmbed} from 'discord.js';
 import {api, HttpException} from 'nextkit';
 import {z} from 'zod';
 import {bodySchema} from '../v2-util/schema';
@@ -55,11 +55,27 @@ export default api({
 		switch (body.type) {
 			case 'Comment': {
 				const author = await client.user(body.data.userId);
+				const comment = await client.comment(body.data.id);
 
 				embed
 					.setTitle(`Comment ${body.action}d by ${author.name}.`)
 					.setDescription(body.data.body)
+					.setURL(comment.url)
 					.setAuthor(author.name, author.avatarUrl);
+
+				break;
+			}
+
+			case 'Issue': {
+				embed
+					.setTitle(`Issue ${body.action}d`)
+					.setURL(body.url)
+					.setDescription(body.data.description)
+					.addField(
+						'Labels',
+						body.data.labels.map(label => label.name).join(', '),
+						true,
+					);
 
 				break;
 			}
@@ -70,6 +86,7 @@ export default api({
 
 				embed
 					.setTitle(`Reaction ${body.action}d by ${author.name}.`)
+					.setURL(comment.url)
 					.addField('Comment', `[Click Here](${comment.url})`, true)
 					.addField('Emoji', `:${body.data.emoji}:`, true);
 

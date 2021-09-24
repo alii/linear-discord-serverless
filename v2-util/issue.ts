@@ -1,5 +1,24 @@
 import {z} from 'zod';
-import {Action, createAllStates, dateSchema, defaultRemoveSchema} from './util';
+import {createAllStates, dateSchema, defaultRemoveSchema} from './util';
+
+const team = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	key: z.string(),
+});
+
+const label = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	color: z.string(),
+});
+
+const state = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	color: z.string(),
+	type: z.string(),
+});
 
 const commons = z.object({
 	id: z.string().uuid(),
@@ -19,24 +38,9 @@ const commons = z.object({
 	subscriberIds: z.array(z.string().uuid()),
 	creatorId: z.string().uuid(),
 	labelIds: z.array(z.string().uuid()),
-	state: z.object({
-		id: z.string().uuid(),
-		name: z.string(),
-		color: z.string(),
-		type: z.string(),
-	}),
-	team: z.object({
-		id: z.string().uuid(),
-		name: z.string(),
-		key: z.string(),
-	}),
-	labels: z.array(
-		z.object({
-			id: z.string().uuid(),
-			name: z.string(),
-			color: z.string(),
-		}),
-	),
+	state,
+	team,
+	labels: z.array(label),
 });
 
 export const issue = createAllStates(commons, defaultRemoveSchema).and(
