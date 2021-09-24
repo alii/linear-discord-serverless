@@ -4,6 +4,7 @@ import {api, HttpException} from 'nextkit';
 import {z} from 'zod';
 import {bodySchema} from '../v2-util/schema';
 import fetch from 'node-fetch';
+import {Label} from '../v1-util/_types';
 
 const querySchema = z.object({
 	api: z.string(),
@@ -70,28 +71,65 @@ export default api({
 				embed
 					.setTitle(`Issue ${body.action}d`)
 					.setURL(body.url)
+					.setColor(body.data.state.color)
 					.setDescription(body.data.description)
 					.addField(
 						'Labels',
-						body.data.labels.map(label => label.name).join(', '),
+						// Have to specify type here because Zod is too recursive for TypeScript to be able to infer
+						// the correct type for each item in the array. idk how to fix this 🤣
+						body.data.labels.map((label: Label) => label.name).join(', '),
 						true,
-					);
+					)
+					.addField('State', body.data.state.name);
 
 				break;
 			}
 
 			case 'Reaction': {
-				const author = await client.user(body.data.userId);
 				const comment = await client.comment(body.data.commentId);
 
 				embed
-					.setTitle(`Reaction ${body.action}d by ${author.name}.`)
+					.setTitle(`Reaction ${body.action}d by ${body.data.user.name}.`)
 					.setURL(comment.url)
 					.addField('Comment', `[Click Here](${comment.url})`, true)
 					.addField('Emoji', `:${body.data.emoji}:`, true);
 
 				break;
 			}
+
+			case 'Cycle': {
+				const team = await client.team(body.data.teamId);
+				const cycle = await client.cycle(body.data.id);
+
+				const issues =
+					cycle.issueCountHistory[cycle.issueCountHistory.length - 1];
+
+				const completed =
+					cycle.completedIssueCountHistory[
+						cycle.completedIssueCountHistory.length - 1
+					];
+
+				embed
+					.setTitle(`Cycle ${body.action}d for team ${team.name}`)
+					.addField('Starts', body.data.startsAt.format('YYYY-MM-dd'), true)
+					.addField('Ends', body.data.endsAt.format('YYYY-MM-dd'), true)
+					.addField('Issues', issues)
+					.addField('Completed Issues', completed, true);
+
+				if (team.description) {
+					embed.setDescription(team.description);
+				}
+
+				break;
+			}
+
+			// case 'IssueLabel': {
+			// 	break;
+			// }
+
+			// case 'Project': {
+			// 	break;
+			// }
 
 			default: {
 				throw new HttpException(

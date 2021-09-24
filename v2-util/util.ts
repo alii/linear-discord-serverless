@@ -3,7 +3,8 @@ import {AnyZodObject, z} from 'zod';
 
 export const dateSchema = z
 	.date()
-	.or(z.string().transform(str => dayjs(str).toDate()));
+	.or(z.string())
+	.transform(str => dayjs(str));
 
 export const enum Action {
 	CREATE = 'create',
