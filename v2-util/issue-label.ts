@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {Action, createAllStates, dateSchema, defaultRemoveSchema} from './util';
+import {createAllStates, dateSchema, defaultRemoveSchema} from './util';
 
 const commons = z.object({
 	id: z.string().uuid(),
