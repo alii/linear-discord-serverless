@@ -6,20 +6,14 @@ import {issue} from './issue';
 import {issueLabel} from './issue-label';
 import {project} from './project';
 import {reaction} from './reaction';
-import {date} from './util';
+import {dateSchema, defaultAction} from './util';
 
 const commons = z.object({
-	action: z.enum(['create', 'update', 'remove']),
 	organizationId: z.string().uuid(),
-	createdAt: date,
+	createdAt: dateSchema,
+	action: defaultAction,
 });
 
-export const bodySchema = comment
-	.or(issue)
-	.or(issueLabel)
-	.or(project)
-	.or(cycle)
-	.or(reaction)
-	.and(commons);
-
-const result = bodySchema.parse({});
+export const bodySchema = commons.and(
+	comment.or(issue).or(issueLabel).or(project).or(cycle).or(reaction),
+);

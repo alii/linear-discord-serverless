@@ -1,13 +1,13 @@
 import {z} from 'zod';
-import {date} from './util';
+import {dateSchema} from './util';
 
 export const issue = z.object({
 	type: z.literal('Issue'),
 	url: z.string().url(),
 	data: z.object({
 		id: z.string().uuid(),
-		createdAt: date,
-		updatedAt: date,
+		createdAt: dateSchema,
+		updatedAt: dateSchema,
 		number: z.number().positive(),
 		title: z.string(),
 		description: z.string(),

@@ -1,28 +1,28 @@
 import {z} from 'zod';
-import {date} from './util';
+import {Actions, dateSchema} from './util';
 
-const data = z.object({
+const commons = z.object({
 	id: z.string().uuid(),
-	createdAt: date,
-	updatedAt: date,
+	createdAt: dateSchema,
+	updatedAt: dateSchema,
 	name: z.string(),
 	color: z.string(),
 	teamId: z.string().uuid(),
 	creatorId: z.string().uuid(),
 });
 
-export const issueLabel = z
-	.object({
-		data,
-	})
-	.or(
-		z.object({
-			action: z.literal('remove'),
-			data: z
-				.object({
-					archivedAt: date,
-				})
-				.merge(data),
-		}),
-	)
-	.and(z.object({type: z.literal('IssueLabel')}));
+const removeState = z.object({
+	action: z.literal(Actions.REMOVE),
+	data: z.object({archivedAt: dateSchema}).merge(commons),
+});
+
+const updateOrCreateState = z.object({
+	action: z.enum([Actions.CREATE, Actions.UPDATE]),
+	data: commons,
+});
+
+export const issueLabel = updateOrCreateState.or(removeState).and(
+	z.object({
+		type: z.literal('IssueLabel'),
+	}),
+);

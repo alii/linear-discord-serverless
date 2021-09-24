@@ -1,12 +1,12 @@
 import {z} from 'zod';
-import {date} from './util';
+import {dateSchema} from './util';
 
 export const comment = z.object({
 	type: z.literal('Comment'),
 	data: z.object({
 		id: z.string().uuid(),
-		createdAt: date,
-		updatedAt: date,
+		createdAt: dateSchema,
+		updatedAt: dateSchema,
 		body: z.string(),
 		userId: z.string().uuid(),
 		issueId: z.string().uuid(),
