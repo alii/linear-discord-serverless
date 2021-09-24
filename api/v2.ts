@@ -1,10 +1,6 @@
-import { LinearClient } from "@linear/sdk";
-import { api, HttpException } from "nextkit";
-import { z } from "zod";
-
-// Linear's trusted ip range, this comes from
-// https://developers.linear.app/docs/graphql/webhooks#how-does-a-webhook-work
-const LINEAR_IP_RANGE = ["35.231.147.226", "35.243.134.228"];
+import {LinearClient} from '@linear/sdk';
+import {api, HttpException} from 'nextkit';
+import {z} from 'zod';
 
 const querySchema = z.object({
 	api: z.string(),
@@ -12,24 +8,31 @@ const querySchema = z.object({
 	id: z.string(),
 });
 
-const resourceTypes = ["Comment", "Issue", "IssueLabel", "Project", "Cycle", "Reaction"] as const;
-
 export default api({
 	async GET(req) {
-		const ip = z.string().parse(req.headers["x-vercel-forwarded-for"]);
+		// Linear's trusted ip range, this comes from
+		// https://developers.linear.app/docs/graphql/webhooks#how-does-a-webhook-work
+		const ip = z
+			.enum(['35.231.147.226', '35.243.134.228'])
+			.safeParse(req.headers['x-vercel-forwarded-for']);
 
-		if (!LINEAR_IP_RANGE.includes(ip)) {
-			throw new HttpException(400, "This request came from an untrusted ip.");
+		if (!ip.success) {
+			throw new HttpException(400, 'This request came from an untrusted ip.');
 		}
 
-		const { token, id, api } = querySchema.parse(req.query);
+		const query = querySchema.safeParse(req.query);
+
+		if (!query.success) {
+			throw new HttpException(400, 'You are missing query parameters!');
+		}
+
+		const {token, id, api} = query.data;
+
 		const client = new LinearClient({
 			apiKey: api,
-			headers: {
-				"User-Agent": "github.com/alii/linear-discord-serverless",
-			},
+			headers: {'User-Agent': 'github.com/alii/linear-discord-serverless'},
 		});
 
-		return { success: true };
+		return {success: true};
 	},
 });

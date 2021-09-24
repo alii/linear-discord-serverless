@@ -1,4 +1,4 @@
-export type Action = "create" | "update" | "remove" | string;
+export type Action = 'create' | 'update' | 'remove' | string;
 
 export type RequestBody = {
 	action: Action;
@@ -6,11 +6,11 @@ export type RequestBody = {
 	url: string;
 } & (
 	| {
-			type: "Issue";
+			type: 'Issue';
 			data: Issue;
 	  }
 	| {
-			type: "Comment";
+			type: 'Comment';
 			data: Comment;
 	  }
 );
@@ -19,7 +19,7 @@ export type Issue = {
 	id: string;
 	title: string;
 	subscriberIds: string[];
-	previousIdentifiers: Issue["id"][];
+	previousIdentifiers: Issue['id'][];
 	createdAt: string;
 	updatedAt: string;
 	archivedAt: string;
