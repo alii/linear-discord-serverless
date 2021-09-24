@@ -6,6 +6,20 @@ const date = z.date().or(z.string().transform(str => day(str).toDate()));
 export const bodySchema = z
 	.object({
 		type: z.literal('Comment'),
+		id: z.string().uuid(),
+		createdAt: date,
+		updatedAt: date,
+		body: z.string(),
+		userId: z.string().uuid(),
+		issueId: z.string().uuid(),
+		issue: z.object({
+			id: z.string().uuid(),
+			title: z.string(),
+		}),
+		user: z.object({
+			id: z.string().uuid(),
+			name: z.string(),
+		}),
 	})
 	.or(
 		z.object({
