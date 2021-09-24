@@ -1,0 +1,16 @@
+{
+	"quoteProps": "consistent",
+	"useTabs": true,
+	"trailingComma": "all",
+	"arrowParens": "avoid",
+	"bracketSpacing": false,
+	"singleQuote": true,
+	"overrides": [
+		{
+			"files": "**/*.html",
+			"options": {
+				"printWidth": 400
+			}
+		}
+	]
+}
