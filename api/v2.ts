@@ -75,11 +75,12 @@ export default api({
 				break;
 			}
 
-			default:
+			default: {
 				throw new HttpException(
 					400,
 					`The resource type ${body.type} is not supported yet!`,
 				);
+			}
 		}
 
 		const webhook = `https://discord.com/api/webhooks/${webhookId}/${webhookToken}`;
@@ -89,6 +90,7 @@ export default api({
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				embeds: [embed.toJSON()],
+				avatar_url: 'https://lds.alistair.cloud/linear.png',
 			}),
 		});
 	},
