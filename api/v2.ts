@@ -95,7 +95,7 @@ export default api({
 					.addField('State', body.data.state.name, true);
 
 				if (assignee) {
-					embed.addField('Assigned to', assignee.name);
+					embed.addField('Assigned to', `[${assignee.name}](${assignee.url})`);
 				}
 
 				break;

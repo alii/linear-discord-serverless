@@ -3,20 +3,119 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>linear-discord-serverless</title>
-		<link rel="stylesheet" href="./index.css" />
+		<style>
+			body {
+				padding: 5%;
+				font-family: -apple-system, sans-serif;
+				background: #121219;
+				color: #ffffffcc;
+			}
+
+			a {
+				color: white;
+			}
+
+			svg {
+				height: 24px;
+				width: 24px;
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 10px;
+			}
+
+			input {
+				width: 100%;
+				background: #ffffff0f;
+				padding: 5px 10px;
+				border-radius: 5px;
+				border: none;
+				color: white;
+			}
+
+			#output-container {
+				margin-top: 52px;
+			}
+
+			.select-none {
+				user-select: none;
+				-webkit-user-select: none;
+			}
+		</style>
 	</head>
 	<body>
+		<a href="./v1.html">Looking for the old instructions?</a>
 		<h1>
 			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
 			</svg>
-			linear-discord-serverless
+			linear-discord-serverless <b>v2</b>
 		</h1>
-		<h3>Installation instructions</h3>
-		<a href="./v1.html">Looking for the old instructions?</a>
-		<p>
-			This version is still in development! Check the status on GitHub
-			<a href="https://github.com/alii/linear-discord-serverless/pull/5/files">alii/linear-discord-serverless/pull/5/files</a>
-		</p>
+		<div class="grid">
+			<label>
+				<span>Discord webhook URL</span>
+				<input id="webhook" type="text" placeholder="https://discord.com/api/webhooks/.../..." />
+			</label>
+
+			<label>
+				<span>Personal API token</span>
+				<input id="api" type="text" placeholder="XXXXXXXXXXXXX" />
+			</label>
+		</div>
+
+		<div id="output-container">
+			<span class="select-none">Your webhook url is:</span>
+			<span id="output"></span>
+		</div>
+
+		<script>
+			const webhook = document.getElementById('webhook');
+			const api = document.getElementById('api');
+			const output = document.getElementById('output');
+
+			/**
+			 * Figures out if a given url is a webhook
+			 * @param url {string} The webhook URL
+			 * @return url is `https://discord.com/api/webhooks/${string}/${string}`
+			 */
+			function isWebhook(url) {
+				return url.startsWith('https://discord.com/api/webhooks/');
+			}
+
+			/**
+			 * Parses a webhook URL
+			 * @param url {string}
+			 * @return {{id: string, token: string}}
+			 */
+			function parseWebhook(url) {
+				const split = url.replace('https://discord.com/api/webhooks/', '').split('/');
+				const [id, token] = split;
+				return {id, token};
+			}
+
+			webhook.addEventListener('blur', function (e) {
+				const {value} = e.target;
+
+				if (value.trim() === '') {
+					return;
+				}
+
+				const isValid = isWebhook(value);
+
+				if (!isValid) {
+					alert('Invalid webhook URL');
+				}
+			});
+
+			api.addEventListener('input', function (e) {
+				const {value} = e.target;
+
+				const {id, token} = parseWebhook(webhook.value);
+
+				output.textContent = `https://lds.alistair.cloud/v2?token=${token}&id=${id}&api=${value}`;
+			});
+		</script>
 	</body>
 </html>
