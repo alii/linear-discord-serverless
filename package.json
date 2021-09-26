@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@types/moment": "^2.13.0",
-		"@types/node-fetch": "^2.5.12",
+		"@types/node-fetch": "^2.5.3",
 		"prettier": "^2.4.1",
 		"vercel": "^23.1.2"
 	},
@@ -18,9 +18,9 @@
 		"discord.js": "^12.4.1",
 		"moment": "^2.29.1",
 		"next": "^11.1.2",
-		"nextkit": "^1.1.0",
+		"nextkit": "^1.2.3",
 		"node-fetch": "^2.6.5",
-		"zod": "^3.8.2",
+		"zod": "^3.9.1",
 		"zod-to-json-schema": "^3.6.1"
 	},
 	"scripts": {

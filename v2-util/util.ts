@@ -2,6 +2,14 @@ import dayjs from 'dayjs';
 import {AnyZodObject, z} from 'zod';
 
 /**
+ * Get the issue ID from url
+ * @param link issue url
+ */
+export function getId(link: string): string {
+	return link.split('/')[5].split('#')[0];
+}
+
+/**
  * Schema for a value that could be resolved into a date
  */
 export const dateResolvable = z

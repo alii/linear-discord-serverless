@@ -1,10 +1,12 @@
 import {LinearClient} from '@linear/sdk';
-import {EmbedField, MessageEmbed} from 'discord.js';
-import {api, HttpException} from 'nextkit';
+import {MessageEmbed} from 'discord.js';
+import {HttpException} from 'nextkit';
 import {z} from 'zod';
 import {bodySchema} from '../v2-util/schema';
 import fetch from 'node-fetch';
 import {Label} from '../v1-util/_types';
+import {api} from '../v2-util/api';
+import {getId} from '../v2-util/util';
 
 const querySchema = z.object({
 	api: z.string(),
@@ -69,7 +71,7 @@ export default api({
 
 			case 'Issue': {
 				embed
-					.setTitle(`Issue ${body.action}d`)
+					.setTitle(`Issue ${body.action}d [${getId(body.url)}]`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
 					.setDescription(body.data.description)
@@ -80,7 +82,7 @@ export default api({
 						body.data.labels.map((label: Label) => label.name).join(', '),
 						true,
 					)
-					.addField('State', body.data.state.name);
+					.addField('State', body.data.state.name, true);
 
 				break;
 			}
@@ -113,8 +115,8 @@ export default api({
 					.setTitle(`Cycle ${body.action}d for team ${team.name}`)
 					.addField('Starts', body.data.startsAt.format('YYYY-MM-dd'), true)
 					.addField('Ends', body.data.endsAt.format('YYYY-MM-dd'), true)
-					.addField('Issues', issues)
-					.addField('Completed Issues', completed, true);
+					.addField('Issues', issues.toString())
+					.addField('Completed Issues', completed.toString(), true);
 
 				if (team.description) {
 					embed.setDescription(team.description);
