@@ -48,7 +48,8 @@ export default api({
 			headers: {'User-Agent': 'github.com/alii/linear-discord-serverless'},
 		});
 
-		const body = bodySchema.parse(req.body);
+		// const body = bodySchema.parse(req.body);
+		const body = req.body as z.infer<typeof bodySchema>;
 
 		const embed = new MessageEmbed()
 			.setColor(Colors.LINEAR_PURPLE)
@@ -84,14 +85,17 @@ export default api({
 					.setTitle(`Issue ${body.action}d [${getId(body.url)}]`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
-					.addField(
+					.addField('State', body.data.state.name, true);
+
+				if (body.data.labels) {
+					embed.addField(
 						'Labels',
 						// Have to specify type here because Zod is too recursive for TypeScript to be able to infer
 						// the correct type for each item in the array. idk how to fix this 🤣
 						body.data.labels.map((label: Label) => label.name).join(', '),
 						true,
-					)
-					.addField('State', body.data.state.name, true);
+					);
+				}
 
 				if (assignee) {
 					embed.addField('Assigned to', `[${assignee.name}](${assignee.url})`);

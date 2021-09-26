@@ -40,7 +40,7 @@ const commons = z.object({
 	labelIds: z.array(z.string().uuid()),
 	state,
 	team,
-	labels: z.array(label),
+	labels: z.array(label).optional(),
 });
 
 export const issue = createAllStates(commons, defaultRemoveSchema).and(
