@@ -98,7 +98,11 @@ export default api({
 				}
 
 				if (assignee) {
-					embed.addField('Assigned to', `[${assignee.name}](${assignee.url})`);
+					embed.addField(
+						'Assigned to',
+						`[${assignee.name}](${assignee.url})`,
+						true,
+					);
 				}
 
 				if (body.data.description?.length) {
