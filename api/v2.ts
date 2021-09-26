@@ -22,8 +22,8 @@ const enum Colors {
 	WARN = '#d9aa58',
 }
 
-const avatar = 'https://lds.alistair.cloud/linear.png';
-const footer = '⚡️ powered by lds.alistair.cloud';
+const avatar = 'https://i.imgur.com/SICZmw8.png';
+const footer = 'Linear App • ⚡ lds.alistair.cloud';
 
 export default api({
 	async POST(req) {
@@ -70,7 +70,17 @@ export default api({
 			}
 
 			case 'Issue': {
+				const creator = await client.user(body.data.creatorId);
+				const assignee = body.data.assigneeId
+					? await client.user(body.data.assigneeId)
+					: null;
+
 				embed
+					.setAuthor(
+						`Created by ${creator.name}`,
+						creator.avatarUrl,
+						creator.url,
+					)
 					.setTitle(`Issue ${body.action}d [${getId(body.url)}]`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
@@ -83,6 +93,10 @@ export default api({
 						true,
 					)
 					.addField('State', body.data.state.name, true);
+
+				if (assignee) {
+					embed.addField('Assigned to', assignee.name);
+				}
 
 				break;
 			}
