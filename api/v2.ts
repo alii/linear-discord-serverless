@@ -84,7 +84,6 @@ export default api({
 					.setTitle(`Issue ${body.action}d [${getId(body.url)}]`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
-					.setDescription(body.data.description)
 					.addField(
 						'Labels',
 						// Have to specify type here because Zod is too recursive for TypeScript to be able to infer
@@ -96,6 +95,10 @@ export default api({
 
 				if (assignee) {
 					embed.addField('Assigned to', `[${assignee.name}](${assignee.url})`);
+				}
+
+				if (body.data.description?.length) {
+					embed.setDescription(body.data.description);
 				}
 
 				break;
