@@ -62,7 +62,7 @@ export default api({
 				const comment = await client.comment(body.data.id);
 
 				embed
-					.setTitle(`Comment ${body.action}d by ${author.name}.`)
+					.setTitle(`Comment on ${body.data.issue.title} [${getId(body.url)}]`)
 					.setDescription(body.data.body)
 					.setURL(comment.url)
 					.setAuthor(author.name, author.avatarUrl);

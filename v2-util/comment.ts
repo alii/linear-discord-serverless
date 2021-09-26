@@ -3,6 +3,7 @@ import {dateResolvable} from './util';
 
 export const comment = z.object({
 	type: z.literal('Comment'),
+	url: z.string().url(),
 	data: z.object({
 		id: z.string().uuid(),
 		createdAt: dateResolvable,
