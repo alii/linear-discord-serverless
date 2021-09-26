@@ -167,6 +167,17 @@ export default api({
 				embeds: [embed.toJSON()],
 				avatar_url: avatar,
 			}),
+		}).then(async res => {
+			if (res.status >= 400) {
+				// Shouldn't throw a non-Error but I want to
+				throw new LDSDiscordApiError(JSON.stringify(await res.json()));
+			}
 		});
 	},
 });
+
+class LDSDiscordApiError extends Error {
+	constructor(public readonly data: string) {
+		super('Something went wrong sending to Discord.');
+	}
+}
