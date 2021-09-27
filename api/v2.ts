@@ -82,7 +82,7 @@ export default api({
 						creator.avatarUrl,
 						creator.url,
 					)
-					.setTitle(`Issue ${body.action}d [${getId(body.url)}]`)
+					.setTitle(`[${getId(body.url)}] Issue ${body.action}d`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
 					.addField('State', body.data.state.name, true);
