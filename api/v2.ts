@@ -78,11 +78,11 @@ export default api({
 
 				embed
 					.setAuthor(
-						`Created by ${creator.name}`,
+						`${body.action}d by ${creator.name}`,
 						creator.avatarUrl,
 						creator.url,
 					)
-					.setTitle(`[${getId(body.url)}] Issue ${body.action}d`)
+					.setTitle(`[${getId(body.url)}] ${body.data.title}`)
 					.setURL(body.url)
 					.setColor(body.data.state.color)
 					.addField('State', body.data.state.name, true);
