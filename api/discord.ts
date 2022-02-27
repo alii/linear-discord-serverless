@@ -35,13 +35,6 @@ export default async function handler(
 		});
 	}
 
-	if (!body.data) {
-		return void res.json({
-			success: false,
-			message: 'Issue data was not sent',
-		});
-	}
-
 	if (!body.url) {
 		return void res.json({
 			success: false,
