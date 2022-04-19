@@ -76,12 +76,12 @@
 			const output = document.getElementById('output');
 
 			/**
-			 * Figures out if a given url is a webhook
+			 * Figures out if a given url is a valid Discord webhook
 			 * @param url {string} The webhook URL
-			 * @return url is `https://discord.com/api/webhooks/${string}/${string}`
+			 * @return a boolean indicating if the url is `https://discord.com/api/webhooks/${string}/${string}` with the domain potentially being ptb/canary.discord.com
 			 */
 			function isWebhook(url) {
-				return url.startsWith('https://discord.com/api/webhooks/');
+				return ["https://discord.com", "https://canary.discord.com", "https://ptb.discord.com"].some(domain => url.startsWith(domain) && url.includes('/api/webhooks'));
 			}
 
 			/**
@@ -90,6 +90,8 @@
 			 * @return {{id: string, token: string}}
 			 */
 			function parseWebhook(url) {
+				if (url.includes('ptb.')) url = url.replace('ptb.', '');
+				if (url.includes('canary.')) url = url.replace('canary.', '');
 				const split = url.replace('https://discord.com/api/webhooks/', '').split('/');
 				const [id, token] = split;
 				return {id, token};
