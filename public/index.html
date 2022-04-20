@@ -78,10 +78,10 @@
 			/**
 			 * Figures out if a given url is a valid Discord webhook
 			 * @param url {string} The webhook URL
-			 * @return a boolean indicating if the url is `https://discord.com/api/webhooks/${string}/${string}`, `https://canary.discord.com/api/webhooks/${string}/${string}`, or `https://ptb.discord.com/api/webhooks/${string}/${string}`
+			 * @return a boolean indicating if the url is `https://*.discord.com/api/webhooks/...
 			 */
 			function isWebhook(url) {
-				return ["https://discord.com", "https://canary.discord.com", "https://ptb.discord.com"].some(domain => url.startsWith(domain) && url.includes('/api/webhooks'));
+				return /https?:\/\/([a-z0-9]+[.])*discord[.]com\/api\/webhooks/.test(url.toLowerCase());
 			}
 
 			/**
