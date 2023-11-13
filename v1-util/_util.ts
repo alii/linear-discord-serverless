@@ -69,8 +69,8 @@ export function error(message: string): MessageEmbed {
 		.setDescription(message)
 		.setColor('#ff6363')
 		.setFooter(
-			'Linear App',
-			'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png',
+			'Linear',
+			'https://lds.alistair.cloud/linear-full.jpeg',
 		)
 		.setTimestamp()
 		.setAuthor(
@@ -108,8 +108,8 @@ export async function sendComment(
 		.addField('Edited', payload.edited ? 'Yes' : 'No', true)
 		.setTimestamp(moment(payload.createdAt).toDate())
 		.setFooter(
-			`Linear App • ${type}`,
-			'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png',
+			`Linear • ${type}`,
+			'https://lds.alistair.cloud/linear-full.jpeg',
 		);
 
 	const request = await exec(url, embed);
@@ -145,8 +145,8 @@ export async function sendIssue(
 		.setURL(metadata.url)
 		.setTimestamp()
 		.setFooter(
-			`Linear App • ${type}`,
-			'https://pbs.twimg.com/profile_images/1121592030449168385/MF6whgy1_400x400.png',
+			`Linear • ${type}`,
+			'https://lds.alistair.cloud/linear-full.jpeg',
 		);
 
 	if (payload.labels && payload.labels.length > 0) {
