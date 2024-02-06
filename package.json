@@ -21,7 +21,9 @@
 		"next": "^11.1.2",
 		"nextkit": "^1.2.3",
 		"node-fetch": "^2.6.5",
-		"zod": "3.8.2"
+		"zod": "3.8.2",
+		"react": "^17.0.2",
+		"react-dom": "^17.0.2"
 	},
 	"scripts": {
 		"d": "vercel dev"
